@@ -1,0 +1,42 @@
+[project]
+name = "esup-news"
+version = "0.2.0"
+description = "ESUP News — protótipo de validação (ingestão, classificação e curadoria)"
+requires-python = ">=3.11"
+readme = "README.md"
+dependencies = [
+    "httpx>=0.27",
+    "python-dotenv>=1.0",
+    "apscheduler>=3.10",
+    "streamlit>=1.36",
+    "pandas>=2.2",
+    "openpyxl>=3.1",
+    "scipy>=1.13",
+    "rich>=13.7",
+    "typer>=0.12",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2",
+    "pytest-cov>=5.0",
+    "ruff>=0.5",
+]
+
+[project.scripts]
+esup-news = "esup_news.cli:app"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["esup_news*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
