@@ -1,4 +1,4 @@
-"""Seed dos 7 temas do The Prism com configuração de fonte primária/secundária."""
+"""Seed dos 8 temas do The Prism com configuração de fonte primária/secundária."""
 from __future__ import annotations
 
 import json
@@ -50,6 +50,13 @@ COURSES = [
     {
         "slug": "comportamento",
         "name": "Comportamento",
+        "primary_provider": "newsdata",
+        "secondary_provider": "thenewsapi",
+        "query_languages": ["pt"],
+    },
+    {
+        "slug": "saude",
+        "name": "Saúde",
         "primary_provider": "newsdata",
         "secondary_provider": "thenewsapi",
         "query_languages": ["pt"],

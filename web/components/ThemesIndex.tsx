@@ -13,9 +13,9 @@ export function ThemesIndex() {
           <Reveal variant="rise" className="col-span-12 md:col-span-5">
             <div className="eyebrow">índice</div>
             <h2 className="mt-4 font-serif text-5xl leading-[1.05] tracking-tight md:text-7xl md:leading-[0.95] md:tracking-tightest letterspread">
-              Sete temas.
+              Oito temas.
               <br />
-              Sete capítulos.
+              Oito capítulos.
             </h2>
           </Reveal>
           <Reveal

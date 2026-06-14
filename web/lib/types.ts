@@ -5,7 +5,8 @@ export type ThemeSlug =
   | "gestao"
   | "educacao"
   | "financas"
-  | "comportamento";
+  | "comportamento"
+  | "saude";
 
 export type Theme = {
   slug: ThemeSlug;

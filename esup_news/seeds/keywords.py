@@ -49,6 +49,13 @@ KEYWORDS: dict[str, list[str]] = {
         "psicologia organizacional", "bem-estar", "burnout", "adolescência",
         "saúde emocional",
     ],
+    "saude": [
+        "saúde", "medicina", "saúde pública", "SUS", "Anvisa", "ministério da saúde",
+        "vacina", "medicamento", "câncer", "doença", "tratamento médico", "cirurgia",
+        "diabetes", "obesidade", "nutrição", "saúde da mulher",
+        "dermatologia", "estética", "harmonização facial", "cirurgia plástica",
+        "procedimento estético", "skincare", "rejuvenescimento",
+    ],
 }
 
 EXCLUDES: dict[str, list[str]] = {
@@ -59,6 +66,7 @@ EXCLUDES: dict[str, list[str]] = {
     "educacao": ["concurso público fraude"],
     "financas": [],
     "comportamento": ["horóscopo", "signo", "astrologia"],
+    "saude": ["fofoca", "horóscopo", "dieta milagrosa"],
 }
 
 

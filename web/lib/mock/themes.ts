@@ -64,6 +64,15 @@ export const THEMES: Theme[] = [
     description:
       "Saúde mental, psicologia, comportamento, neurociência e bem-estar: os temas que pautam o cuidado e a compreensão da mente humana.",
   },
+  {
+    slug: "saude",
+    name: "Saúde",
+    shortName: "Saúde",
+    label: "Saúde",
+    tagline: "Medicina, bem-estar e a estética que cuida do corpo.",
+    description:
+      "Saúde pública, avanços da medicina, prevenção, dermatologia e os procedimentos estéticos que pautam o cuidado com o corpo e a aparência.",
+  },
 ];
 
 export function getTheme(slug: string): Theme | undefined {
