@@ -196,4 +196,14 @@
   [data-stagger="3"] { transition-delay: 270ms; }
   [data-stagger="4"] { transition-delay: 360ms; }
   [data-stagger="5"] { transition-delay: 450ms; }
+
+  /* Marca do prisma no header: descansa e gira 360° de tempos em tempos */
+  @keyframes prism-spin {
+    0%, 84% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .prism-spin {
+    transform-origin: 50% 50%;
+    animation: prism-spin 8s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  }
 }
