@@ -47,7 +47,7 @@ export function MobileMenu() {
       </button>
 
       {open && (
-        <div className="absolute inset-x-0 top-full border-b border-paper/10 bg-ink/95 backdrop-blur-md">
+        <div className="absolute inset-x-0 top-full border-b border-paper/10 bg-ink shadow-2xl shadow-black/40">
           <nav className="mx-auto max-w-editorial px-6 pb-4">
             <ul className="flex flex-col">
               {THEMES.map((t, i) => (

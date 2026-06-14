@@ -89,7 +89,7 @@ export default async function ArticlePage({
         </div>
 
         <Reveal variant="fade" stagger={3}>
-          <div className="mt-12 flex flex-wrap items-center gap-x-10 gap-y-3 border-t border-paper/15 pt-6 text-paper/65">
+          <div className="mt-12 flex flex-wrap items-center gap-x-6 md:gap-x-10 gap-y-3 border-t border-paper/15 pt-6 text-paper/65">
             <span className="eyebrow">fonte · {article.source}</span>
             <span className="eyebrow">{formatDate(article.publishedAt)}</span>
             <span className="eyebrow">{formatRelative(article.publishedAt)}</span>
@@ -165,7 +165,7 @@ export default async function ArticlePage({
                 )}
               </div>
             </Reveal>
-            <div className="grid grid-cols-12 gap-x-10 gap-y-14">
+            <div className="grid grid-cols-12 gap-x-6 md:gap-x-10 gap-y-14">
               {related.map((r, i) => {
                 const stagger = (Math.min(i, 5) as 0 | 1 | 2 | 3 | 4 | 5);
                 return (

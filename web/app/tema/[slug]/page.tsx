@@ -92,7 +92,7 @@ export default async function ThemePage({
               </span>
             </div>
           </Reveal>
-          <div className="grid grid-cols-12 gap-10">
+          <div className="grid grid-cols-12 gap-6 md:gap-10">
             <Reveal variant="rise" className="col-span-12 md:col-span-8">
               <Parallax distance={-20}>
                 <NewsCard article={featured} size="hero" />
@@ -141,7 +141,7 @@ export default async function ThemePage({
           <Reveal variant="fade">
             <div className="eyebrow mb-8">explorar outros temas</div>
           </Reveal>
-          <div className="grid grid-cols-12 gap-x-10 gap-y-2">
+          <div className="grid grid-cols-12 gap-x-6 md:gap-x-10 gap-y-2">
             {THEMES.filter((t) => t.slug !== theme.slug).map((t, i) => {
               const stagger = (Math.min(i, 5) as 0 | 1 | 2 | 3 | 4 | 5);
               return (

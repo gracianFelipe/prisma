@@ -108,7 +108,7 @@ type VariantProps = {
 
 function ImageLeft({ featured, secondary }: VariantProps) {
   return (
-    <div className="grid grid-cols-12 gap-x-10 gap-y-12">
+    <div className="grid grid-cols-12 gap-x-6 md:gap-x-10 gap-y-12">
       <Reveal variant="rise" className="col-span-12 md:col-span-7">
         <Parallax distance={-18}>
           <NewsCard article={featured} size="feature" />
@@ -141,7 +141,7 @@ function ImageLeft({ featured, secondary }: VariantProps) {
 
 function ImageRight({ featured, secondary }: VariantProps) {
   return (
-    <div className="grid grid-cols-12 gap-x-10 gap-y-12">
+    <div className="grid grid-cols-12 gap-x-6 md:gap-x-10 gap-y-12">
       <div className="col-span-12 space-y-7 md:col-span-5">
         {secondary.slice(0, 3).map((a, i) => {
           const stagger = (Math.min(i, 5) as 0 | 1 | 2 | 3 | 4 | 5);
@@ -175,14 +175,14 @@ function ImageRight({ featured, secondary }: VariantProps) {
 function Stacked({ featured, secondary }: VariantProps) {
   return (
     <div className="space-y-14">
-      <div className="grid grid-cols-12 gap-10">
+      <div className="grid grid-cols-12 gap-6 md:gap-10">
         <Reveal variant="rise" className="col-span-12 md:col-span-8 md:col-start-3">
           <Parallax distance={-24}>
             <NewsCard article={featured} size="hero" />
           </Parallax>
         </Reveal>
       </div>
-      <div className="grid grid-cols-12 gap-x-10 gap-y-10">
+      <div className="grid grid-cols-12 gap-x-6 md:gap-x-10 gap-y-10">
         {secondary.slice(0, 3).map((a, i) => {
           const stagger = (Math.min(i, 5) as 0 | 1 | 2 | 3 | 4 | 5);
           return (
@@ -203,7 +203,7 @@ function Stacked({ featured, secondary }: VariantProps) {
 
 function SplitGrid({ theme, featured, secondary }: VariantProps) {
   return (
-    <div className="grid grid-cols-12 gap-x-10 gap-y-12">
+    <div className="grid grid-cols-12 gap-x-6 md:gap-x-10 gap-y-12">
       <Reveal variant="rise" className="col-span-12 md:col-span-5">
         <Parallax distance={-30}>
           <div className="relative">

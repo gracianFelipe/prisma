@@ -66,7 +66,7 @@ export function CursorHalo() {
     <div
       ref={ref}
       aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-0 h-[420px] w-[420px] rounded-full opacity-60 mix-blend-screen transition-[opacity,filter] duration-500"
+      className="pointer-events-none fixed left-0 top-0 z-0 hidden h-[420px] w-[420px] rounded-full opacity-60 mix-blend-screen transition-[opacity,filter] duration-500 md:block"
       style={{
         background:
           "radial-gradient(closest-side, rgb(var(--accent) / 0.18), rgb(var(--accent) / 0.06) 40%, transparent 70%)",
