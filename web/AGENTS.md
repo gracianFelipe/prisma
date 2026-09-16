@@ -45,7 +45,6 @@ O portal lê **um snapshot JSON commitado**, não o banco:
   `getArticleBySlug`, `getFeaturedByTheme`, `getRelated`, `getLatest`.
 - `lib/mock/themes.ts` — **canônico**, não é mock: é a definição dos 8 temas
   que todo componente importa. O nome da pasta ficou por histórico.
-- `lib/mock/articles.ts` — resíduo do estágio de mock, hoje sem nenhum import.
 
 Ao trocar a origem dos dados, **manter as assinaturas** de `lib/data/articles.ts`
 para que as páginas não precisem mudar.

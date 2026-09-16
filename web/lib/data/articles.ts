@@ -2,8 +2,7 @@ import type { Article, ThemeSlug } from "../types";
 import snapshot from "./articles.json";
 
 // Snapshot real gerado pelo backend Python (`python -m esup_news.cli export-web`)
-// a partir do SQLite. Mesma interface do antigo lib/mock/articles.ts — as páginas
-// não mudam. Re-rode o export-web após cada ingest para atualizar.
+// a partir do SQLite. Re-rode o export-web após cada ingest para atualizar.
 export const ARTICLES: Article[] = snapshot as unknown as Article[];
 
 export function getArticlesByTheme(slug: ThemeSlug): Article[] {
