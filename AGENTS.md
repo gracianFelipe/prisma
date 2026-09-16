@@ -78,25 +78,28 @@ Default section order:
 
 When the user requests a durable behavior change, record it here or in the relevant child AGENTS.md
 
+- Responder em **português**.
+- Segurança é checklist explícito: ver SEC-CHECK acima. Ao revisar código, não
+  inventar problema onde não há nem forçar princípio que não se encaixa no
+  contexto do arquivo.
+
 ## Child DOX Index
 
-Ainda nao existe AGENTS.md filho: os contratos de todos os subtrees vivem neste
-documento raiz. O mapa abaixo diz onde cada pasta e governada.
-
-| Subtree | Conteudo | Contrato em |
+| Doc | Escopo | Governa |
 |---|---|---|
-| `esup_news/` | Pipeline Python: config, db, CLI, scheduler, seeds | Sec. 2-4, 7-9 |
-| `esup_news/providers/` | Clientes NewsData.io e The News API, registry, `redact()` | Sec. 4, 9 |
-| `esup_news/ingestion/` | normalizer (`is_http_url`), dedupe, queries, orchestrator | Sec. 4, 8, 9 |
-| `esup_news/classification/` | scorer (invariante do breakdown) e matcher | Sec. 4, 8 |
-| `esup_news/analysis/` | reports (Excel), soft_duplicate, web_export (snapshot do portal) | Sec. 4 |
-| `admin.py` | Painel Streamlit de curadoria; saida sempre escapada | Sec. 4, 6 |
-| `web/` | Portal Next.js estatico (SSG), sem backend proprio | Sec. 12 |
-| `tests/` | pytest: normalizer, scorer, dedupe | Sec. 8 |
-| `docs/` | `checklist-seguranca.md`, padrao SEC-CHECK obrigatorio | Topo deste arquivo |
+| `esup_news/AGENTS.md` | `esup_news/**` | Pipeline Python: providers, ingestão, classificação, análise, seeds, CLI, scheduler |
+| `web/AGENTS.md` | `web/**` | Portal Next.js estático: stack, paleta, layout, temas, microinterações, mobile |
 
-Criar um AGENTS.md filho quando uma dessas pastas ganhar regra local que nao
-caiba na raiz sem duplicacao. Hoje nenhuma passou desse limite.
+Fica nesta raiz, sem doc filho:
+
+- `admin.py` — painel Streamlit de curadoria (ver "Painel de curadoria").
+- `tests/` — o contrato de teste está em `esup_news/AGENTS.md`, porque é o que
+  as suítes cobrem.
+- `docs/checklist-seguranca.md` — padrão SEC-CHECK, obrigatório (ver abaixo).
+- `CHANGELOG.md` — histórico datado de decisões.
+
+Criar um doc filho novo quando uma pasta ganhar regra local que não caiba no
+doc mais próximo sem duplicação.
 
 ## Segurança (SEC-CHECK)
 Todo código escrito ou editado neste repo deve seguir as 12 regras de
@@ -107,125 +110,69 @@ Se violar alguma, avise antes de entregar.
 Para auditoria completa de um arquivo específico, use o prompt da seção 0
 desse mesmo arquivo.
 
-# AGENTS.md — guia para agentes de IA trabalhando neste repositório
-
-> Este arquivo é o ponto de entrada para qualquer IA que vá editar este projeto.
-> Leia antes de começar. Atualize ao final de mudanças relevantes (ver §10).
-
-O repositório contém **duas frentes**: o **protótipo de validação** em Python
-(coleta, classificação, curadoria — descrito a seguir) e o **portal público
-editorial** em Next.js, em `web/` (descrito na §12).
-
 ---
 
-## 1. O que é este projeto
+# The Prism — contrato raiz
 
-**The Prism — protótipo de validação (v0.2).** Sistema local em Python que
-coleta notícias de duas APIs (NewsData.io e The News API), normaliza,
-deduplica, classifica por tema, e expõe um painel Streamlit para
-curadoria humana. O objetivo do protótipo é responder 4 perguntas com dados
-reais antes de construir o sistema completo:
+## Purpose
 
-1. Qual API entrega mais volume útil por tema em PT-BR?
-2. Quais keywords têm alta precisão e quais geram ruído?
-3. Qual a taxa real de duplicidade bloqueada e quantas escapam?
-4. O score automático prevê bem a decisão humana?
+**The Prism** é um jornal de curadoria organizado por temas. O repositório tem
+duas frentes que se falam por um único arquivo:
 
-> **Nota de nomenclatura.** O produto se chama **The Prism**, mas internamente o
-> backend Python preserva o vocabulário original: o pacote `esup_news`, a
-> tabela SQLite `courses`, a flag `--course` da CLI e as colunas `course_id`
-> foram **mantidos de propósito** para não quebrar o schema e os scripts. A
-> tradução "curso → tema" vale para o produto e para o portal (`web/`); no
-> backend, "curso" segue sendo o termo técnico.
+1. **Backend Python** (`esup_news/`) — coleta, deduplica, classifica e guarda
+   em SQLite; gera o snapshot `web/lib/data/articles.json`.
+2. **Portal público** (`web/`) — Next.js estático que lê esse snapshot em build
+   time.
 
-Não é produção. Não há frontend público nesta fase.
+Não há API entre os dois. O backend roda local; o portal é publicado na Vercel.
 
----
+> **Nomenclatura.** O produto e o portal falam em **tema**. O backend Python
+> preserva **"curso"** como termo técnico (pacote `esup_news`, tabela
+> `courses`, flag `--course`, coluna `course_id`), de propósito. Detalhe em
+> `esup_news/AGENTS.md`.
 
-## 2. Stack oficial (não trocar sem autorização)
+## Ownership
 
-- Python **3.11+**
-- **SQLite** (arquivo em `data/esup_news.db`)
-- **Streamlit** para curadoria
-- **Typer + Rich** para CLI
-- **httpx** para HTTP
-- **APScheduler** para rodadas agendadas
-- **pandas + openpyxl** para relatórios
+Esta raiz é o rail DOX: contrato de segurança, stack, comandos, `admin.py` e o
+índice acima. Detalhe de implementação mora no doc filho mais próximo.
 
-Dependências em `pyproject.toml`. Instalar com `pip install -e ".[dev]"` dentro
-de um venv.
+## Local Contracts
 
----
+### Stack oficial (não trocar sem autorização)
 
-## 3. Estrutura do projeto
+- Python **3.11+** · **SQLite** (`data/esup_news.db`) · **Streamlit** para
+  curadoria · **Typer + Rich** para CLI · **httpx** para HTTP ·
+  **APScheduler** para rodadas agendadas · **pandas + openpyxl** para relatórios.
+- Portal: Next.js + TypeScript + Tailwind (versões em `web/AGENTS.md`).
 
-```
-esup_news/
-  config.py            # carrega .env, expõe settings
-  db.py                # schema SQLite + trigger + helpers de conexão
-  cli.py               # CLI Typer (init-db, seed, ingest, stats, report, ...)
-  scheduler.py         # APScheduler: 2x/dia incremental + 1x/semana
-  seeds/
-    courses.py         # 8 cursos com primary/secondary provider
-    keywords.py        # keywords iniciais por curso (PRD)
-  providers/
-    base.py            # interface NewsProvider + FetchResult
-    newsdata.py        # cliente NewsData.io (country=br quando só PT)
-    thenewsapi.py      # cliente The News API
-    registry.py        # get_provider(name)
-  ingestion/
-    normalizer.py      # canonical_url, title_hash, NormalizedArticle
-    dedupe.py          # insert_article + tratamento de UNIQUE
-    queries.py         # constrói queries OR a partir de keywords
-    orchestrator.py    # roda curso por curso, aplica fallback
-  classification/
-    scorer.py          # score v0.2 com breakdown completo
-    matcher.py         # classifica artigo em N cursos
-  analysis/
-    soft_duplicate.py  # detector cross-fonte (não bloqueante)
-    reports.py         # cobertura, keywords, faixas de score, fallback
-admin.py               # Streamlit (raiz, executado por `streamlit run`)
-tests/                 # pytest (test_normalizer, test_scorer, test_dedupe)
-```
+Dependências Python em `pyproject.toml`; instalar com `pip install -e ".[dev]"`
+dentro de um venv.
 
----
+### Segredos
 
-## 4. Princípios não-negociáveis
+Chaves vivem **só** no `.env`, que está no `.gitignore` junto de `.vercel`.
+`NEWSDATA_API_KEY`, `THENEWSAPI_API_KEY` e `VERCEL_TOKEN` nunca entram em
+commit, log, banco ou mensagem de chat. `.env.example` é o arquivo versionado.
 
-Estes são compromissos arquiteturais do PRD v0.2. Não revogar sem aprovação:
+### Painel de curadoria (`admin.py`)
 
-- **Curadoria por par `(article_id, course_id)`**, nunca por artigo global. O
-  mesmo texto pode ser aprovado para um curso e rejeitado para outro.
-- **Trigger `trg_create_pending_decision`**: toda inserção em
-  `article_course_matches` cria automaticamente uma linha `pending` em
-  `editorial_decisions`. Não desabilitar.
-- **Deduplicação bloqueante na ingestão** via `UNIQUE(url_hash)` e
-  `UNIQUE(title_hash, source_domain)`. Soft duplicate é só análise offline,
-  nunca bloqueia.
-- **`score_breakdown` deve somar exatamente `relevance_score`**. Qualquer
-  ajuste no scorer precisa preservar essa invariante (validada em
-  `tests/test_scorer.py::test_score_breakdown_sums_to_score`).
-- **4 gatilhos de fallback discretos**: `http_error`, `zero_results`,
-  `low_unique`, `low_quality`. Cada um logado em `job_logs.fallback_reason`.
-- **NewsData.io é primária para temas PT-BR**, The News API para Tecnologia.
-  Híbrida para Negócios e Gestão. Está em
-  `esup_news/seeds/courses.py` (nome do arquivo mantido por compatibilidade).
-- **Console rich em UTF-8**: nada de caracteres acima de ASCII em mensagens
-  de CLI sem antes garantir `sys.stdout.reconfigure(encoding="utf-8")`
-  (Windows cp1252 quebra).
-- **URL de terceiro so entra se for http/https** (IV). `is_http_url()` em
-  `ingestion/normalizer.py` barra `javascript:`, `data:` e `file:`; os dois
-  providers descartam o artigo na ingestao. Nao afrouxar: essa URL vira link
-  clicavel no painel de curadoria e e exportada para o portal.
-- **Todo dado de terceiro escapado antes do HTML** (OE). `admin.py` renderiza
-  com `unsafe_allow_html=True`; titulo, descricao, fonte, idioma e termos
-  passam obrigatoriamente por `esc()`. Nunca interpolar valor de API direto.
-- **Chave de API nunca em log nem no banco**. Erro de provider passa por
-  `redact()` (`providers/base.py`) antes de virar `job_logs.error_message`.
+`admin.py` renderiza com `unsafe_allow_html=True`, então **todo dado vindo de
+API de terceiro é escapado antes de virar HTML** (OE): título, descrição,
+fonte, idioma e termos passam obrigatoriamente por `esc()`. Link da fonte só
+sai por `safe_href()` — sem URL http/https, não vira link. Nunca interpolar
+valor de API direto no markup.
 
----
+Direção visual **minimalista e editorial, inspirada no MAD**:
 
-## 5. Como rodar localmente
+- Paleta neutra (fundo creme `#fafaf7`, texto quase-preto `#111`).
+- Tipografia serifada (Times) em títulos, sans (Inter/Helvetica) em corpo.
+- Sem cards coloridos, sem sombras pesadas, sem ícones decorativos.
+- Separadores por linha fina, não por caixas.
+- Botões retangulares (border-radius 0), borda preta sólida.
+
+Mudança visual não deve virar dashboard corporativo genérico.
+
+## Work Guidance
 
 ```bash
 # venv
@@ -242,7 +189,7 @@ python -m esup_news.cli seed
 
 # coleta manual
 python -m esup_news.cli ingest --all --window=12h
-python -m esup_news.cli ingest --course=direito --window=24h
+python -m esup_news.cli ingest --course=justica --window=24h
 
 # análise
 python -m esup_news.cli stats --by=course
@@ -250,6 +197,10 @@ python -m esup_news.cli stats --by=keyword --min-volume=5
 python -m esup_news.cli stats --by=score-bucket
 python -m esup_news.cli detect-soft-duplicates --since=24h
 python -m esup_news.cli report --out=relatorio.xlsx
+python -m esup_news.cli info
+
+# publica os aprovados no portal
+python -m esup_news.cli export-web
 
 # curadoria
 streamlit run admin.py
@@ -258,290 +209,15 @@ streamlit run admin.py
 python -m esup_news.scheduler
 ```
 
-Testes: `pytest -v` (18 testes, deve passar tudo em < 1s).
+Console rich em UTF-8: nada acima de ASCII em mensagem de CLI sem garantir
+`sys.stdout.reconfigure(encoding="utf-8")` — cp1252 do Windows quebra.
 
----
-
-## 6. Estilo visual do Streamlit
-
-A direção visual é **minimalista e editorial, inspirada no MAD**:
-
-- Paleta neutra (fundo creme `#fafaf7`, texto quase-preto `#111`).
-- Tipografia serifada (Times) em títulos, sans (Inter/Helvetica) em corpo.
-- Sem cards coloridos, sem sombras pesadas, sem ícones decorativos.
-- Separadores por linha fina, não por caixas.
-- Botões retangulares (border-radius 0), borda preta sólida.
-
-Mudanças visuais não devem virar dashboard corporativo genérico.
-
----
-
-## 7. Convenções de código
-
-- Pacote organizado por **responsabilidade**, não por tipo de arquivo.
-- `from __future__ import annotations` no topo de cada módulo.
-- Sem docstrings longos. Linha-única explicando o **porquê** quando o "o quê"
-  não está óbvio no nome.
-- Sem comentários redundantes.
-- Tipos em assinaturas públicas. Internas: opcional.
-- IDs externos das APIs em `articles.external_id`; o JSON cru fica em
-  `articles.raw_payload` (sempre serializado).
-
----
-
-## 8. Testes
-
-- `tests/test_normalizer.py` — canonicalização de URL, title hash, stopwords.
-- `tests/test_scorer.py` — invariante da soma do breakdown, recência, exclude.
-- `tests/test_dedupe.py` — UNIQUE constraints, trigger automática de pending.
-
-Toda mudança em normalizer, scorer ou schema **precisa** vir com teste
-correspondente. Rodar `pytest` antes de pedir review.
-
----
-
-## 9. Erros conhecidos e armadilhas
-
-- **Windows cp1252**: caracteres unicode em prints quebram a CLI. Use ASCII
-  ou garanta `sys.stdout.reconfigure(encoding="utf-8")`. Já tratado em `cli.py`.
-- **The News API plano grátis**: 100 requests/dia, 3 artigos por request.
-  Orçamento atual de coleta (~28 req/dia) tem folga, mas qualquer mudança que
-  multiplique queries por curso precisa revisar isso.
-- **NewsData.io**: o filtro `country=br` é aplicado só quando a query é
-  apenas em PT. Se misturar com inglês, o país é omitido para não estreitar
-  demais.
-- **`canonical_url`**: já lowercaseia host e tira `www.`, `utm_*`, `gclid`,
-  `fbclid` e fragmento. Não duplicar essa lógica fora de `normalizer.py`.
-
----
-
-## 10. Como atualizar este arquivo
-
-**Após qualquer mudança grande no projeto, atualize o AGENTS.md.**
-
-Mudança grande = qualquer uma destas:
-
-- Novo módulo ou pacote dentro de `esup_news/`.
-- Nova tabela, coluna ou trigger no schema SQLite.
-- Novo provedor de notícias.
-- Mudança nos princípios da §4 (ex.: trocar dedupe, mudar política de
-  fallback, mexer no score breakdown).
-- Nova dependência em `pyproject.toml` ou troca de stack.
-- Novo comando na CLI.
-- Mudança na estratégia primária/secundária por curso.
-- Nova fase do produto (sair do protótipo, virar produto).
-
-Como atualizar:
-
-1. Edite a seção pertinente (estrutura, princípios, comandos, armadilhas).
-2. Mantenha o tom direto e objetivo. Sem "este documento descreve...".
-3. Se algo da §4 mudou, registre na §11 (changelog) com a data.
-
----
-
-## 11. Changelog
-
-- **2026-09-15** - SEC-CHECK aplicado no backend: escape de saida (OE) nos seis
-  pontos de render do `admin.py` e link da fonte restrito a http/https;
-  allowlist de esquema de URL (IV) via `normalizer.is_http_url`, com descarte
-  na ingestao dos dois providers; redacao da chave de API em mensagens de erro
-  (`providers/base.redact`). Cinco testes novos (23 no total).
-
-- **2026-06-13** — rebrand **Prisma → The Prism** (apenas o nome do produto;
-  temas/slugs/vocabulário inalterados); chave do `localStorage`
-  `prisma-theme` → `theprism-theme`; pacote npm `prisma-web` → `theprism-web`;
-  nome/script do `pyproject` `prisma` → `theprism`; classes CSS `.prisma-` do
-  `admin.py` mantidas.
-- **2026-06-13** — rebrand **ESUP News → Prisma**. Produto deixou de ser
-  amarrado à escola ESUP e virou um jornal de curadoria geral organizado por
-  temas. Os 7 cursos viraram 7 temas: `direito`→`justica` (Justiça),
-  `administracao`→`negocios` (Negócios),
-  `sistemas-da-informacao`→`tecnologia` (Tecnologia),
-  `processos-gerenciais`→`gestao` (Gestão), `pedagogia`→`educacao` (Educação),
-  `ciencias-contabeis`→`financas` (Finanças),
-  `psicologia`→`comportamento` (Comportamento). No portal (`web/`) o
-  vocabulário "curso → tema" foi aplicado por completo: `Course`→`Theme`,
-  `CourseSlug`→`ThemeSlug`, `COURSES`→`THEMES`, componentes
-  `CourseBlock`→`ThemeBlock`, `CourseTracker`→`ThemeTracker`,
-  `CoursesIndex`→`ThemesIndex`, mock `lib/mock/courses.ts`→`lib/mock/themes.ts`,
-  rota `/curso/[slug]`→`/tema/[slug]`, chave de tema do `localStorage`
-  `esup-theme`→`prisma-theme`. **Backend mantido de propósito**: pacote
-  `esup_news`, tabela `courses`, flag `--course`, colunas `course_id` e nomes
-  de env var **não** mudaram — só os 7 slugs/nomes dos seeds, as strings de
-  marca e o texto institucional da ESUP foram ajustados.
-- **2026-05-13** — v0.2 inicial: estrutura do protótipo, 7 cursos, 125
-  keywords, dois provedores, scorer com breakdown, fallback com 4 gatilhos,
-  Streamlit minimalista, 18 testes verdes.
-- **2026-05-13** — portal público `web/` adicionado: Next.js 15 + TypeScript +
-  Tailwind, App Router, home + páginas de curso + páginas de notícia, paleta
-  escura (#0a0a0a / #f5f0e8 / #c8a96a), placeholders abstratos em SVG (sem
-  fotos), build com 34 rotas estáticas. Ver §12.
-- **2026-05-13** — sistema de temas (claro/escuro) e camada de microinterações
-  de scroll adicionados ao `web/`. Tokens passaram a viver em CSS vars
-  (`--ink`, `--paper`, `--accent`), Tailwind consome via `rgb(var(--...))`
-  com alpha. Reveal por IntersectionObserver, Parallax via rAF + CSS custom
-  property, ScrollProgress, CursorHalo, ThemeTracker sticky. Ver §12.8 e §12.9.
-
----
-
-## 12. Portal público (`web/`)
-
-Aplicação **Next.js 15 (App Router) + TypeScript + Tailwind CSS** em
-`c:\scripts\esup-news\web\`. Independente do backend Python — hoje usa mocks,
-no futuro consumirá os dados via API leve a partir do SQLite.
-
-> No portal, o conceito editorial chama-se **tema** (`Theme` / `themeSlug`).
-> É o mesmo conceito que o backend chama de "curso" (`course_id`) — a tradução
-> acontece só na fronteira com o frontend. Ver §11 (changelog 2026-06-13).
-
-### 12.1 Stack e dependências
-
-- **Next.js 15.0.3** com App Router e React 19 (RC compatível).
-- **TypeScript 5.6** em modo `strict`.
-- **Tailwind CSS 3.4** com tokens próprios (sem `shadcn`, sem Material, sem
-  bibliotecas de UI).
-- **Fontes do sistema** (Times/Georgia para serif editorial, Inter/Helvetica
-  para sans). Não carregar Google Fonts via CDN.
-- **Imagens**: placeholders SVG procedurais determinísticos
-  (`components/AbstractCover.tsx`). Sem fotos de banco neste estágio.
-
-### 12.2 Paleta oficial (não trocar sem aprovação)
-
-- Fundo principal: `#0a0a0a` (`bg-ink`)
-- Texto principal: `#f5f0e8` (`text-paper`)
-- Acento: `#c8a96a` (`text-accent`)
-- Variações de texto: `text-paper/85`, `text-paper/70`, `text-paper/60`,
-  `text-paper/40` — não usar cinzas arbitrários.
-
-### 12.3 Estrutura de pastas
-
-```
-web/
-├── app/
-│   ├── layout.tsx                 # shell + Header + Footer
-│   ├── page.tsx                   # home
-│   ├── globals.css                # tokens base, eyebrow, editorial-link
-│   ├── tema/[slug]/page.tsx       # página de tema (SSG)
-│   └── noticia/[slug]/page.tsx    # página de notícia (SSG)
-├── components/
-│   ├── Header.tsx
-│   ├── Footer.tsx
-│   ├── Hero.tsx
-│   ├── LatestStrip.tsx            # tira "desta semana"
-│   ├── ThemesIndex.tsx            # índice "oito temas, oito capítulos"
-│   ├── ThemeBlock.tsx             # bloco de tema na home (4 variantes)
-│   ├── NewsCard.tsx               # card de notícia (5 tamanhos)
-│   └── AbstractCover.tsx          # SVG procedural por seed
-├── lib/
-│   ├── types.ts                   # Theme, Article, ThemeSlug
-│   ├── format.ts                  # formatDate, formatRelative
-│   └── mock/
-│       ├── themes.ts              # 8 temas
-│       └── articles.ts            # 23 notícias mockadas
-├── package.json
-├── tailwind.config.ts
-├── tsconfig.json
-└── next.config.mjs
-```
-
-### 12.4 Princípios visuais (não-negociáveis)
-
-- **Editorial, não dashboard.** Sem cards coloridos, sem sombras pesadas, sem
-  ícones decorativos, sem badges genéricos.
-- **Tipografia faz o peso visual**: serif grande para títulos
-  (`font-serif tracking-tightest`), sans para corpo. Tamanhos hero podem
-  chegar a `text-[10rem]` em desktop.
-- **Espaço negativo generoso**: `py-20` é o mínimo de uma seção; `py-28`
-  e `py-36` são comuns em fechamentos.
-- **Microinterações sutis**: `editorial-link` (sublinhado animado),
-  `hover-zoom` (SVG cresce 2%), `animate-rise`/`animate-fade` no hero.
-  Nada de Framer Motion neste estágio.
-- **Ritmo na home**: a função `ThemeBlock` alterna 4 variantes
-  (`image-left`, `image-right`, `stacked`, `split-grid`) por índice. Não
-  remover essa variação — é o que cria o "storytelling de scroll".
-
-### 12.5 Comandos
+## Verification
 
 ```bash
-cd web
-npm install              # primeira vez
-npm run dev              # http://localhost:3000
-npm run build            # gera estáticos (1 rota por notícia + 8 temas)
-npm start                # serve build de produção
+pytest -v                        # backend: 23 testes
+cd web && npx tsc --noEmit       # portal: typecheck
+cd web && npm run build          # portal: SSG completo
 ```
 
-### 12.6 Modelo de dados (mock → futuro backend)
-
-`Article` em `lib/types.ts` espelha o que o backend Python produz:
-`id`, `slug`, `themeSlug`, `title`, `subtitle`, `body`, `source`,
-`publishedAt` (ISO 8601), `externalUrl`, `featured`, `imageSeed`.
-
-> O backend entrega esse vínculo como `course_id`; o portal mapeia para
-> `themeSlug` na fronteira de dados.
-
-Quando o backend for conectado, criar `lib/data/` com funções de mesmo nome
-que `lib/mock/` (`getArticlesByTheme`, `getArticleBySlug`, `getFeaturedByTheme`,
-`getRelated`, `getLatest`), implementadas em cima de uma API leve do Python
-(provavelmente FastAPI lendo o SQLite). Manter a assinatura idêntica para que
-as páginas não precisem mudar.
-
-### 12.8 Sistema de temas (claro/escuro)
-
-Tokens semânticos vivem em **CSS custom properties** em `app/globals.css`:
-
-```css
-:root, [data-theme="dark"]  { --ink: 10 10 10;   --paper: 245 240 232; --accent: 200 169 106; ... }
-[data-theme="light"]        { --ink: 244 240 232;--paper: 17 16 14;    --accent: 138 95 30;   ... }
-```
-
-Tailwind os consome via `rgb(var(--...) / <alpha-value>)`. As classes seguem
-iguais (`bg-ink`, `text-paper`, `text-accent`) — só a paleta resolvida muda.
-
-- O atributo `data-theme="dark|light"` é fixado em `<html>` por
-  `components/ThemeScript.tsx`, um `<script>` síncrono inline no `<head>`.
-  Roda antes do React hidratar — **sem flash**.
-- A preferência é persistida em `localStorage` com a chave `theprism-theme`.
-  Se não houver preferência salva, segue `prefers-color-scheme`.
-- O botão de troca está em `components/ThemeToggle.tsx`, presente no Header.
-- A troca usa transição `0.6s` em `background-color` e `color` no body. Não
-  troca abruptamente.
-
-**Não retornar para classes `bg-[#hex]` literais.** Toda cor é via token,
-para que o tema responda sem retoque.
-
-### 12.9 Camada de microinterações de scroll
-
-Tudo é **CSS + JS pequeno**. Sem Framer Motion, sem GSAP. Cada peça respeita
-`prefers-reduced-motion` e cai para estado final imediato quando o usuário
-optou por menos movimento.
-
-| Componente | Função |
-|---|---|
-| `Reveal` | Aparece quando entra no viewport. Variantes: `fade`, `rise`, `from-left`. Stagger via prop. Usa `IntersectionObserver`. |
-| `Parallax` | Desloca um filho proporcionalmente ao scroll, via `requestAnimationFrame` + CSS custom property `--p` (0..1). |
-| `ScrollProgress` | Linha fina dourada no topo (transform: scaleX) + ticker `nn / 100` no canto inferior direito. |
-| `CursorHalo` | Halo dourado suave que segue o cursor com easing. Aparece só em `(pointer: fine)`. |
-| `ThemeTracker` | Pílula fixa no canto inferior esquerdo que mostra o tema atual enquanto rola pelos blocos da home. |
-
-Convenções:
-
-- **Sempre passar pelo `Reveal`** para introduzir um bloco editorial novo.
-  Nunca duplicar IntersectionObserver inline.
-- **`Parallax` só em capa, título hero ou numerais decorativos.** Não usar
-  em corpo de texto — cansa.
-- **`letterspread`** é uma utility que afina o tracking durante a entrada
-  do título. Aplicar só em títulos grandes (H1/H2 hero), nunca em corpo.
-- Animações de scroll consomem o estado via `data-revealed="true|false"`,
-  então qualquer estilização adicional deve usar esse seletor — não inventar
-  novas variáveis de estado.
-
-### 12.10 Convenções específicas do `web/`
-
-- Componentes em **PascalCase**, em `components/`.
-- Páginas seguem App Router; `params` agora é `Promise` (Next 15).
-- Slugs de notícia são **kebab-case do título** sem stopwords; gerados no
-  backend Python (ver `esup_news/ingestion/normalizer.py`).
-- Nunca usar `<img>` cru — usar `AbstractCover` para mocks; quando entrar foto
-  real, trocar para `next/image`.
-- Não acrescentar bibliotecas de animação ou UI sem discutir. O custo de
-  contexto e bundle é alto e o visual atual não precisa.
+Rodar a verificação da frente que você tocou antes de pedir review.
