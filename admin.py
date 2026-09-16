@@ -6,6 +6,7 @@ alto e velocidade de decisão.
 """
 from __future__ import annotations
 
+import html
 import json
 from datetime import datetime, timezone
 
@@ -13,6 +14,7 @@ import streamlit as st
 
 from esup_news.config import settings
 from esup_news.db import connect
+from esup_news.ingestion.normalizer import is_http_url
 
 st.set_page_config(
     page_title="The Prism — Curadoria",
@@ -201,6 +203,21 @@ def fmt_date_local(iso: str) -> str:
         return iso or ""
 
 
+def esc(value) -> str:
+    """Escapa dado de terceiro antes de entrar no HTML (OE).
+
+    Titulo, descricao, fonte e idioma vem das APIs de noticia, ou seja, de sites
+    arbitrarios. Como este painel renderiza com unsafe_allow_html, tudo que nao
+    for nosso precisa passar por aqui.
+    """
+    return html.escape("" if value is None else str(value), quote=True)
+
+
+def safe_href(url: str | None) -> str | None:
+    """Devolve a URL so se for http/https; caso contrario nao vira link."""
+    return url if url and is_http_url(url) else None
+
+
 REASONS = ["—", "good", "off_topic", "low_quality", "duplicate", "paywall", "outdated"]
 REASON_LABELS = {
     "—": "—",
@@ -341,33 +358,33 @@ for it in items:
         }.get(it["decision"], "PENDENTE")
 
         tags_html = (
-            f"<span class='prisma-tag tag-curso'>{it['course_name']}</span>"
-            f"<span class='prisma-tag tag-score'>SCORE {it['relevance_score']}</span>"
-            f"<span class='prisma-tag tag-fonte'>{it['source_name'] or it['source_domain'] or '—'}</span>"
-            f"<span class='prisma-tag tag-tempo'>{it['recency_bucket'] or '—'}</span>"
+            f"<span class='prisma-tag tag-curso'>{esc(it['course_name'])}</span>"
+            f"<span class='prisma-tag tag-score'>SCORE {esc(it['relevance_score'])}</span>"
+            f"<span class='prisma-tag tag-fonte'>{esc(it['source_name'] or it['source_domain'] or '—')}</span>"
+            f"<span class='prisma-tag tag-tempo'>{esc(it['recency_bucket'] or '—')}</span>"
             f"<span class='prisma-tag {decision_tag_class}'>{decision_label}</span>"
         )
         st.markdown(tags_html, unsafe_allow_html=True)
 
         # Título
         st.markdown(
-            f"<div class='prisma-title'>{it['title']}</div>",
+            f"<div class='prisma-title'>{esc(it['title'])}</div>",
             unsafe_allow_html=True,
         )
 
         # Descrição
         if it["description"]:
             st.markdown(
-                f"<div class='prisma-subtitle'>{it['description']}</div>",
+                f"<div class='prisma-subtitle'>{esc(it['description'])}</div>",
                 unsafe_allow_html=True,
             )
 
         # Linha de metadados detalhados
         st.markdown(
             f"<div class='prisma-meta'>"
-            f"Publicada em {fmt_date_local(it['published_at'])} · "
-            f"Idioma: {it['language'] or 'desconhecido'} · "
-            f"API: {it['provider']}"
+            f"Publicada em {esc(fmt_date_local(it['published_at']))} · "
+            f"Idioma: {esc(it['language'] or 'desconhecido')} · "
+            f"API: {esc(it['provider'])}"
             f"</div>",
             unsafe_allow_html=True,
         )
@@ -376,17 +393,21 @@ for it in items:
         if terms:
             terms_str = " · ".join(terms[:8])
             st.markdown(
-                f"<div class='prisma-terms'><b>Casou com:</b> {terms_str}</div>",
+                f"<div class='prisma-terms'><b>Casou com:</b> {esc(terms_str)}</div>",
                 unsafe_allow_html=True,
             )
 
         # Link para a fonte original
-        st.markdown(
-            f"<div class='prisma-meta' style='margin-top:0.4rem;'>"
-            f"<a href='{it['url']}' target='_blank' rel='noreferrer'>"
-            f"Abrir notícia na fonte original ↗</a></div>",
-            unsafe_allow_html=True,
-        )
+        href = safe_href(it["url"])
+        if href:
+            st.markdown(
+                f"<div class='prisma-meta' style='margin-top:0.4rem;'>"
+                f'<a href="{esc(href)}" target="_blank" rel="noreferrer noopener">'
+                f"Abrir notícia na fonte original ↗</a></div>",
+                unsafe_allow_html=True,
+            )
+        else:
+            st.caption("Link da fonte ausente ou fora de http/https — nao exibido.")
 
         # Ações
         key = f"{it['article_id']}_{it['course_id']}"

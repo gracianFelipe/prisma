@@ -7,6 +7,18 @@ from dataclasses import dataclass
 from ..ingestion.normalizer import NormalizedArticle
 
 
+def redact(text: str, secret: str | None) -> str:
+    """Tira a chave de API de qualquer texto que vá para log ou banco.
+
+    O erro volta em `FetchResult.error` e é gravado em `job_logs.error_message`.
+    Como a chave viaja na query string, qualquer mensagem que carregue a URL
+    vazaria o segredo de forma permanente.
+    """
+    if not text or not secret:
+        return text
+    return text.replace(secret, "***")
+
+
 @dataclass
 class FetchResult:
     """Resultado de uma chamada de provedor."""

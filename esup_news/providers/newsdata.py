@@ -8,10 +8,11 @@ from ..ingestion.normalizer import (
     NormalizedArticle,
     canonicalize_url,
     extract_domain,
+    is_http_url,
     title_hash,
     url_hash,
 )
-from .base import FetchResult, NewsProvider
+from .base import FetchResult, NewsProvider, redact
 
 NEWSDATA_BASE = "https://newsdata.io/api/1/news"
 
@@ -46,12 +47,12 @@ class NewsDataProvider(NewsProvider):
             with httpx.Client(timeout=settings.http_timeout_seconds) as client:
                 resp = client.get(NEWSDATA_BASE, params=params)
         except httpx.HTTPError as exc:
-            return FetchResult(self.name, query, None, [], 0, error=f"http_error:{exc}")
+            return FetchResult(self.name, query, None, [], 0, error=redact(f"http_error:{exc}", self.api_key))
 
         if resp.status_code >= 400:
             return FetchResult(
                 self.name, query, resp.status_code, [], 0,
-                error=f"http_{resp.status_code}:{resp.text[:200]}",
+                error=redact(f"http_{resp.status_code}:{resp.text[:200]}", self.api_key),
             )
 
         try:
@@ -71,7 +72,8 @@ class NewsDataProvider(NewsProvider):
         url = item.get("link") or ""
         title = (item.get("title") or "").strip()
         published = item.get("pubDate")
-        if not url or not title or not published:
+        # URL de terceiro: só aceitamos http/https (IV na fronteira de entrada).
+        if not is_http_url(url) or not title or not published:
             return None
 
         canonical = canonicalize_url(url)

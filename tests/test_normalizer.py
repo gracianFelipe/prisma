@@ -1,10 +1,12 @@
 from esup_news.ingestion.normalizer import (
     canonicalize_url,
     extract_domain,
+    is_http_url,
     normalize_title,
     title_hash,
     url_hash,
 )
+from esup_news.providers.newsdata import NewsDataProvider
 
 
 def test_canonicalize_removes_tracking_params():
@@ -55,3 +57,42 @@ def test_title_hash_equal_for_variations():
 def test_extract_domain_strips_www():
     assert extract_domain("https://www.folha.uol.com.br/path") == "folha.uol.com.br"
     assert extract_domain("https://G1.globo.com/x") == "g1.globo.com"
+
+
+# --- URL scheme allowlist (IV na fronteira de entrada) ----------------------
+
+def test_is_http_url_accepts_http_and_https():
+    assert is_http_url("https://exemplo.com.br/noticia")
+    assert is_http_url("http://exemplo.com.br/noticia")
+
+
+def test_is_http_url_rejects_dangerous_schemes():
+    assert not is_http_url("javascript:alert(1)")
+    assert not is_http_url("data:text/html;base64,PHNjcmlwdD4=")
+    assert not is_http_url("file:///etc/passwd")
+
+
+def test_is_http_url_rejects_empty_and_hostless():
+    assert not is_http_url("")
+    assert not is_http_url("   ")
+    assert not is_http_url("exemplo.com/sem-esquema")
+
+
+def test_provider_descarta_artigo_com_url_perigosa():
+    """URL fora de http/https nao pode virar artigo — barrada na ingestao."""
+    item = {
+        "link": "javascript:alert(document.cookie)",
+        "title": "Manchete plausivel",
+        "pubDate": "2026-06-14 10:00:00",
+    }
+    assert NewsDataProvider(api_key="dummy")._normalize(item, "q") is None
+
+
+def test_provider_aceita_artigo_com_url_http():
+    item = {
+        "link": "https://exemplo.com.br/noticia/foo",
+        "title": "Manchete plausivel",
+        "pubDate": "2026-06-14 10:00:00",
+    }
+    art = NewsDataProvider(api_key="dummy")._normalize(item, "q")
+    assert art is not None and art.url.startswith("https://")

@@ -54,6 +54,20 @@ def canonicalize_url(url: str) -> str:
     return urlunsplit((scheme, netloc, path, query, ""))
 
 
+# Só http/https entram no banco. Schemes como javascript:, data: e file: podem
+# chegar de fontes de terceiros e acabariam renderizados como link clicável no
+# painel de curadoria e no portal.
+ALLOWED_URL_SCHEMES = frozenset({"http", "https"})
+
+
+def is_http_url(url: str) -> bool:
+    """True só para http/https com host. Barra javascript:, data:, file:, etc."""
+    if not url:
+        return False
+    parts = urlsplit(url.strip())
+    return parts.scheme.lower() in ALLOWED_URL_SCHEMES and bool(parts.netloc)
+
+
 def url_hash(canonical: str) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
