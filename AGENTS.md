@@ -1,3 +1,112 @@
+# DOX framework
+
+- DOX is highly performant AGENTS.md hierarchy installed here
+- Agent must follow DOX instructions across any edits
+
+## Core Contract
+
+- AGENTS.md files are binding work contracts for their subtrees
+- Work products, source materials, instructions, records, assets, and durable docs must stay understandable from the nearest applicable AGENTS.md plus every parent AGENTS.md above it
+
+## Read Before Editing
+
+1. Read the root AGENTS.md
+2. Identify every file or folder you expect to touch
+3. Walk from the repository root to each target path
+4. Read every AGENTS.md found along each route
+5. If a parent AGENTS.md lists a child AGENTS.md whose scope contains the path, read that child and continue from there
+6. Use the nearest AGENTS.md as the local contract and parent docs for repo-wide rules
+7. If docs conflict, the closer doc controls local work details, but no child doc may weaken DOX
+
+Do not rely on memory. Re-read the applicable DOX chain in the current session before editing.
+
+## Update After Editing
+
+Every meaningful change requires a DOX pass before the task is done.
+
+Update the closest owning AGENTS.md when a change affects:
+
+- purpose, scope, ownership, or responsibilities
+- durable structure, contracts, workflows, or operating rules
+- required inputs, outputs, permissions, constraints, side effects, or artifacts
+- user preferences about behavior, communication, process, organization, or quality
+- AGENTS.md creation, deletion, move, rename, or index contents
+
+Update parent docs when parent-level structure, ownership, workflow, or child index changes. Update child docs when parent changes alter local rules. Remove stale or contradictory text immediately. Small edits that do not change behavior or contracts may leave docs unchanged, but the DOX pass still must happen.
+
+## Hierarchy
+
+- Root AGENTS.md is the DOX rail: project-wide instructions, global preferences, durable workflow rules, and the top-level Child DOX Index
+- Child AGENTS.md files own domain-specific instructions and their own Child DOX Index
+- Each parent explains what its direct children cover and what stays owned by the parent
+- The closer a doc is to the work, the more specific and practical it must be
+
+## Child Doc Shape
+
+- Create a child AGENTS.md when a folder becomes a durable boundary with its own purpose, rules, responsibilities, workflow, materials, or quality standards
+- Work Guidance must reflect the current standards of the project or user instructions; if there are no specific standards or instructions yet, leave it empty
+- Verification must reflect an existing check; if no verification framework exists yet, leave it empty and update it when one exists
+
+Default section order:
+- Purpose
+- Ownership
+- Local Contracts
+- Work Guidance
+- Verification
+- Child DOX Index
+
+## Style
+
+- Keep docs concise, current, and operational
+- Document stable contracts, not diary entries
+- Put broad rules in parent docs and concrete details in child docs
+- Prefer direct bullets with explicit names
+- Do not duplicate rules across many files unless each scope needs a local version
+- Delete stale notes instead of explaining history
+- Trim obvious statements, repeated rules, misplaced detail, and warnings for risks that no longer exist
+
+## Closeout
+
+1. Re-check changed paths against the DOX chain
+2. Update nearest owning docs and any affected parents or children
+3. Refresh every affected Child DOX Index
+4. Remove stale or contradictory text
+5. Run existing verification when relevant
+6. Report any docs intentionally left unchanged and why
+
+## User Preferences
+
+When the user requests a durable behavior change, record it here or in the relevant child AGENTS.md
+
+## Child DOX Index
+
+Ainda nao existe AGENTS.md filho: os contratos de todos os subtrees vivem neste
+documento raiz. O mapa abaixo diz onde cada pasta e governada.
+
+| Subtree | Conteudo | Contrato em |
+|---|---|---|
+| `esup_news/` | Pipeline Python: config, db, CLI, scheduler, seeds | Sec. 2-4, 7-9 |
+| `esup_news/providers/` | Clientes NewsData.io e The News API, registry, `redact()` | Sec. 4, 9 |
+| `esup_news/ingestion/` | normalizer (`is_http_url`), dedupe, queries, orchestrator | Sec. 4, 8, 9 |
+| `esup_news/classification/` | scorer (invariante do breakdown) e matcher | Sec. 4, 8 |
+| `esup_news/analysis/` | reports (Excel), soft_duplicate, web_export (snapshot do portal) | Sec. 4 |
+| `admin.py` | Painel Streamlit de curadoria; saida sempre escapada | Sec. 4, 6 |
+| `web/` | Portal Next.js estatico (SSG), sem backend proprio | Sec. 12 |
+| `tests/` | pytest: normalizer, scorer, dedupe | Sec. 8 |
+| `docs/` | `checklist-seguranca.md`, padrao SEC-CHECK obrigatorio | Topo deste arquivo |
+
+Criar um AGENTS.md filho quando uma dessas pastas ganhar regra local que nao
+caiba na raiz sem duplicacao. Hoje nenhuma passou desse limite.
+
+## Segurança (SEC-CHECK)
+Todo código escrito ou editado neste repo deve seguir as 12 regras de
+`docs/checklist-seguranca.md` (secrets, injection, IV/OE, authn/authz,
+fail secure, deps, headers, rate limit, IDOR/SSRF, logging).
+Se violar alguma, avise antes de entregar.
+
+Para auditoria completa de um arquivo específico, use o prompt da seção 0
+desse mesmo arquivo.
+
 # AGENTS.md — guia para agentes de IA trabalhando neste repositório
 
 > Este arquivo é o ponto de entrada para qualquer IA que vá editar este projeto.
@@ -57,7 +166,7 @@ esup_news/
   cli.py               # CLI Typer (init-db, seed, ingest, stats, report, ...)
   scheduler.py         # APScheduler: 2x/dia incremental + 1x/semana
   seeds/
-    courses.py         # 7 cursos com primary/secondary provider
+    courses.py         # 8 cursos com primary/secondary provider
     keywords.py        # keywords iniciais por curso (PRD)
   providers/
     base.py            # interface NewsProvider + FetchResult
@@ -104,6 +213,15 @@ Estes são compromissos arquiteturais do PRD v0.2. Não revogar sem aprovação:
 - **Console rich em UTF-8**: nada de caracteres acima de ASCII em mensagens
   de CLI sem antes garantir `sys.stdout.reconfigure(encoding="utf-8")`
   (Windows cp1252 quebra).
+- **URL de terceiro so entra se for http/https** (IV). `is_http_url()` em
+  `ingestion/normalizer.py` barra `javascript:`, `data:` e `file:`; os dois
+  providers descartam o artigo na ingestao. Nao afrouxar: essa URL vira link
+  clicavel no painel de curadoria e e exportada para o portal.
+- **Todo dado de terceiro escapado antes do HTML** (OE). `admin.py` renderiza
+  com `unsafe_allow_html=True`; titulo, descricao, fonte, idioma e termos
+  passam obrigatoriamente por `esc()`. Nunca interpolar valor de API direto.
+- **Chave de API nunca em log nem no banco**. Erro de provider passa por
+  `redact()` (`providers/base.py`) antes de virar `job_logs.error_message`.
 
 ---
 
@@ -223,6 +341,12 @@ Como atualizar:
 
 ## 11. Changelog
 
+- **2026-09-15** - SEC-CHECK aplicado no backend: escape de saida (OE) nos seis
+  pontos de render do `admin.py` e link da fonte restrito a http/https;
+  allowlist de esquema de URL (IV) via `normalizer.is_http_url`, com descarte
+  na ingestao dos dois providers; redacao da chave de API em mensagens de erro
+  (`providers/base.redact`). Cinco testes novos (23 no total).
+
 - **2026-06-13** — rebrand **Prisma → The Prism** (apenas o nome do produto;
   temas/slugs/vocabulário inalterados); chave do `localStorage`
   `prisma-theme` → `theprism-theme`; pacote npm `prisma-web` → `theprism-web`;
@@ -304,7 +428,7 @@ web/
 │   ├── Footer.tsx
 │   ├── Hero.tsx
 │   ├── LatestStrip.tsx            # tira "desta semana"
-│   ├── ThemesIndex.tsx            # índice "sete temas, sete capítulos"
+│   ├── ThemesIndex.tsx            # índice "oito temas, oito capítulos"
 │   ├── ThemeBlock.tsx             # bloco de tema na home (4 variantes)
 │   ├── NewsCard.tsx               # card de notícia (5 tamanhos)
 │   └── AbstractCover.tsx          # SVG procedural por seed
@@ -312,7 +436,7 @@ web/
 │   ├── types.ts                   # Theme, Article, ThemeSlug
 │   ├── format.ts                  # formatDate, formatRelative
 │   └── mock/
-│       ├── themes.ts              # 7 temas
+│       ├── themes.ts              # 8 temas
 │       └── articles.ts            # 23 notícias mockadas
 ├── package.json
 ├── tailwind.config.ts
@@ -342,7 +466,7 @@ web/
 cd web
 npm install              # primeira vez
 npm run dev              # http://localhost:3000
-npm run build            # gera estáticos (34 rotas hoje)
+npm run build            # gera estáticos (1 rota por notícia + 8 temas)
 npm start                # serve build de produção
 ```
 

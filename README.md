@@ -3,7 +3,7 @@
 # The Prism
 
 **Um jornal de curadoria, organizado por temas.**
-Notícias dos sete temas editoriais, em uma experiência editorial digital com curadoria semanal.
+Notícias dos oito temas editoriais, em uma experiência editorial digital com curadoria semanal.
 
 ```
 Justiça · Negócios · Tecnologia · Gestão
@@ -116,7 +116,7 @@ Aplicação **Next.js 15** com App Router. Visual editorial inspirado em jornais
 
 **O que tem dentro:**
 
-- **Home com storytelling vertical** — hero tipográfico, tira de últimas, índice "Sete temas, sete capítulos", 7 blocos de tema com 4 variações de layout que alternam para criar ritmo, fechamento editorial.
+- **Home com storytelling vertical** — hero tipográfico, tira de últimas, índice "Oito temas, oito capítulos", 8 blocos de tema com 4 variações de layout que alternam para criar ritmo, fechamento editorial.
 - **Página por tema** (`/tema/[slug]`) — destaque principal, lista completa de matérias, navegação para os outros temas.
 - **Página de notícia** (`/noticia/[slug]`) — título serifado generoso, capa em SVG procedural, corpo com largura de prosa, relacionadas do mesmo tema.
 - **Sistema de tema claro/escuro** com persistência em `localStorage` e script anti-flash no `<head>`.
@@ -143,7 +143,7 @@ cp .env.example .env              # preencha NEWSDATA_API_KEY e THENEWSAPI_API_K
 
 # banco
 python -m esup_news.cli init-db
-python -m esup_news.cli seed      # 7 temas + 125 keywords
+python -m esup_news.cli seed      # 8 temas + 140 keywords
 
 # coleta manual
 python -m esup_news.cli ingest --course=justica --window=24h
@@ -176,7 +176,7 @@ npm run dev                       # http://localhost:3000
 Comandos extras:
 
 ```bash
-npm run build                     # build de produção (34 rotas estáticas)
+npm run build                     # build de produção (1 rota por notícia + 8 temas)
 npm start                         # serve build
 ```
 
@@ -197,7 +197,7 @@ the-prism/
 │   ├── db.py                     # schema SQLite + trigger
 │   ├── config.py
 │   ├── scheduler.py              # APScheduler
-│   ├── seeds/                    # 7 temas + keywords
+│   ├── seeds/                    # 8 temas + keywords
 │   ├── providers/                # NewsData.io · The News API
 │   ├── ingestion/                # normalizer · dedupe · orchestrator
 │   ├── classification/           # scorer com breakdown · matcher

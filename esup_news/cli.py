@@ -54,7 +54,7 @@ def cmd_init_db() -> None:
 
 @app.command("seed")
 def cmd_seed() -> None:
-    """Insere/atualiza os 7 cursos e as keywords iniciais."""
+    """Insere/atualiza os 8 cursos e as keywords iniciais."""
     init_db()
     with connect() as conn:
         c = seed_courses(conn)
