@@ -174,6 +174,32 @@ Mudança visual não deve virar dashboard corporativo genérico.
 
 ## Work Guidance
 
+### Branch e PR
+
+**Nunca commitar direto na `main`.** Toda mudanca nasce em branch propria e
+entra por Pull Request, inclusive mudanca so de documentacao.
+
+```bash
+git switch main && git pull
+git switch -c <tipo>/<descricao-curta>
+# ... trabalho + a verificacao da frente tocada (ver Verification) ...
+git push -u origin <tipo>/<descricao-curta>
+gh pr create --fill
+```
+
+- Prefixo do nome: `feat/`, `fix/`, `sec/`, `docs/`, `chore/`, `refactor/`.
+  Descricao em kebab-case: `sec/escape-saida-admin`.
+- **Um PR por assunto.** Correcao de seguranca nao viaja no mesmo PR que
+  reestruturacao de documentacao — se um precisar de revert, o outro cai junto.
+- Rodar a verificacao antes de abrir. PR que nao passa no `pytest` ou no
+  `tsc --noEmit` nao se abre.
+- `main` e a branch de deploy: merge so depois do preview da Vercel verde.
+- Depois do merge: `git switch main && git pull` e apagar a branch.
+- Commit direto na `main` so com autorizacao explicita do usuario, caso a caso.
+  Na duvida, abrir branch.
+
+### Comandos
+
 ```bash
 # venv
 python -m venv .venv
