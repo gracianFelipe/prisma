@@ -1,5 +1,9 @@
 # Changelog
 
+- **2026-09-15** - Fluxo de trabalho passa a exigir branch + Pull Request:
+  nao se commita direto na `main`, um PR por assunto, verificacao verde antes
+  de abrir. Regra no `AGENTS.md` raiz, secao Work Guidance / Branch e PR.
+
 - **2026-09-15** - SEC-CHECK aplicado no backend: escape de saida (OE) nos seis
   pontos de render do `admin.py` e link da fonte restrito a http/https;
   allowlist de esquema de URL (IV) via `normalizer.is_http_url`, com descarte
